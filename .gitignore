@@ -1,0 +1,10 @@
+# macOS
+.DS_Store
+__MACOSX/
+._*
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/

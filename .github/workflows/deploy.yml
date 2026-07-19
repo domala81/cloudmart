@@ -1,0 +1,66 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Required for GitHub OIDC -> AWS role assumption (no static keys).
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: ${{ vars.AWS_REGION }}
+  EKS_CLUSTER_NAME: ${{ vars.EKS_CLUSTER_NAME }}
+  IMAGE_TAG: ${{ github.sha }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Log in to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push backend image
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          docker build -t "$REGISTRY/cloudmart-backend:$IMAGE_TAG" -t "$REGISTRY/cloudmart-backend:latest" ./backend
+          docker push "$REGISTRY/cloudmart-backend:$IMAGE_TAG"
+          docker push "$REGISTRY/cloudmart-backend:latest"
+
+      - name: Build and push frontend image
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          # Set the VITE_API_BASE_URL repo variable to the backend LoadBalancer
+          # URL after the first deploy (e.g. http://<lb-host>:5000/api).
+          VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL }}
+        run: |
+          docker build \
+            --build-arg VITE_API_BASE_URL="${VITE_API_BASE_URL:-/api}" \
+            -t "$REGISTRY/cloudmart-frontend:$IMAGE_TAG" \
+            -t "$REGISTRY/cloudmart-frontend:latest" ./frontend
+          docker push "$REGISTRY/cloudmart-frontend:$IMAGE_TAG"
+          docker push "$REGISTRY/cloudmart-frontend:latest"
+
+      - name: Update kubeconfig
+        run: aws eks update-kubeconfig --name "$EKS_CLUSTER_NAME" --region "$AWS_REGION"
+
+      - name: Deploy to EKS
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          sed "s|BACKEND_IMAGE|$REGISTRY/cloudmart-backend:$IMAGE_TAG|g" k8s/backend.yaml | kubectl apply -f -
+          sed "s|FRONTEND_IMAGE|$REGISTRY/cloudmart-frontend:$IMAGE_TAG|g" k8s/frontend.yaml | kubectl apply -f -
+          kubectl rollout status deployment/cloudmart-backend-app --timeout=180s
+          kubectl rollout status deployment/cloudmart-frontend-app --timeout=180s

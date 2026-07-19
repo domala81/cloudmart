@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudmart-backend-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cloudmart-backend-app
+  template:
+    metadata:
+      labels:
+        app: cloudmart-backend-app
+    spec:
+      serviceAccountName: cloudmart-pod-execution-role
+      containers:
+        - name: cloudmart-backend-app
+          image: BACKEND_IMAGE
+          ports:
+            - containerPort: 5000
+          env:
+            - name: PORT
+              value: "5000"
+          # All AWS IDs and AI keys come from the Terraform-managed Secret
+          # (infra/main.tf -> kubernetes_secret.backend). AWS credentials
+          # themselves are supplied by IRSA via the service account.
+          envFrom:
+            - secretRef:
+                name: cloudmart-backend-secrets
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cloudmart-backend-app-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: cloudmart-backend-app
+  ports:
+    - protocol: TCP
+      port: 5000
+      targetPort: 5000

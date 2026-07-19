@@ -1,0 +1,11 @@
+{
+  "name": "cloudmart-scripts",
+  "private": true,
+  "type": "module",
+  "description": "One-off bootstrap/seed scripts for CloudMart",
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.651.1",
+    "@aws-sdk/lib-dynamodb": "^3.651.1",
+    "openai": "^4.58.2"
+  }
+}

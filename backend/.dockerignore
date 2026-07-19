@@ -1,0 +1,6 @@
+node_modules
+npm-debug.log
+.env
+.DS_Store
+src/lambda/**/node_modules
+src/lambda/**/google_credentials.json

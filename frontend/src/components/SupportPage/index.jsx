@@ -34,6 +34,7 @@ const CustomerSupportPage = () => {
 
   useEffect(() => {
     loadThreadsFromLocalStorage();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

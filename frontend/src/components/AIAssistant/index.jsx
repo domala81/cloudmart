@@ -32,6 +32,7 @@ const AIAssistant = () => {
     if (isOpen && !conversationId) {
       startNewConversation();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
   useEffect(() => {

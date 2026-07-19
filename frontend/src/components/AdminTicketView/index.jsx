@@ -162,6 +162,7 @@ const AdminTicketView = () => {
 
   useEffect(() => {
     fetchTickets();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [statusFilter]);
 
   const fetchTickets = async () => {

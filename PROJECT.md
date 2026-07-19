@@ -36,6 +36,10 @@ Two analytics use cases sit on top of the store:
 
 ## Architecture
 
+![CloudMart architecture — React/Node on AWS EKS with Bedrock, OpenAI, Azure, and GCP BigQuery; GitHub Actions (OIDC) deploys via ECR](docs/architecture/cloudmart_architecture.png)
+
+*Logical view:*
+
 ```mermaid
 flowchart TD
     User([Shopper / Admin]) --> FE[Frontend SPA<br/>React + Vite · EKS pod :5001]

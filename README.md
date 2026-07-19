@@ -23,18 +23,7 @@ Makefile             bootstrap / infra / seed / destroy
 
 ## Architecture
 
-```mermaid
-flowchart TD
-    User([Shopper / Admin]) --> FE[Frontend SPA · EKS :5001]
-    FE -->|REST /api| BE[Backend API · EKS :5000]
-    BE --> DDB[(DynamoDB<br/>products · orders · tickets)]
-    BE --> Bedrock[Bedrock Agent<br/>Claude 3 Sonnet]
-    BE --> OpenAI[OpenAI Assistant<br/>GPT-4o]
-    BE --> Azure[Azure Text Analytics<br/>sentiment]
-    Bedrock --> L1[Lambda listProducts] --> DDB
-    DDB -->|Streams| L2[Lambda addToBigQuery] --> BQ[(BigQuery)]
-    GH[GitHub Actions<br/>OIDC] -->|build → ECR → kubectl| BE
-```
+![CloudMart architecture — React/Node on AWS EKS with Bedrock, OpenAI, Azure, and GCP BigQuery; GitHub Actions (OIDC) deploys via ECR](docs/architecture/cloudmart_architecture.png)
 
 ---
 

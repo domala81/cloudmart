@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { ChevronDown, ChevronUp, Trash2, X } from "lucide-react";
+import { ChevronDown, ChevronUp, Trash2 } from "lucide-react";
 import Header from "../Header";
 import Footer from "../Footer";
 import LoadingSpinner from "../LoadingSpinner";

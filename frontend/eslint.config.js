@@ -29,6 +29,14 @@ export default [
       ...react.configs['jsx-runtime'].rules,
       ...reactHooks.configs.recommended.rules,
       'react/jsx-no-target-blank': 'off',
+      // This app is plain JSX (no TypeScript, no prop-types dependency) and
+      // uses the React 18 automatic JSX runtime, so these rules don't apply.
+      'react/prop-types': 'off',
+      'react/no-unescaped-entities': 'off',
+      'no-unused-vars': [
+        'error',
+        { varsIgnorePattern: '^React$', caughtErrors: 'none', argsIgnorePattern: '^_' },
+      ],
       'react-refresh/only-export-components': [
         'warn',
         { allowConstantExport: true },

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Search, MessageCircle } from "lucide-react";
+import { Search } from "lucide-react";
 import Header from "../Header";
 import Footer from "../Footer";
 import LoadingSpinner from "../LoadingSpinner";
